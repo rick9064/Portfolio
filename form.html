@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Resume</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    /* Modern form styling */
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .form-container h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 0.4rem;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid #ddd;
+      border-radius: 0.6rem;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: #667eea;
+      outline: none;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.4);
+    }
+
+    button {
+      background: #667eea;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Get My Resume</h2>
+    <form id="resumeForm">
+      <label>Full Name</label>
+      <input type="text" name="fullName" placeholder="Enter your name" required>
+
+      <label>Email</label>
+      <input type="email" name="email" placeholder="Enter your email" required>
+
+      <label>Mobile</label>
+      <input type="tel" name="mobile" placeholder="Enter your mobile number" required>
+
+      <label>Gender</label>
+      <select name="gender" required>
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+
+      <label>User Type</label>
+      <select name="userType" required>
+        <option value="">Select</option>
+        <option>HR</option>
+        <option>Recruiter</option>
+        <option>Student</option>
+        <option>Other</option>
+      </select>
+
+      <label>Recruiting for</label>
+      <select name="role" required>
+        <option value="">Select</option>
+        <option value="Frontend">Frontend Developer</option>
+        <option value="ProductDesign">Product Designer</option>
+        <option value="BusinessAnalyst">Business Analyst</option>
+      </select>
+
+      <button type="submit" id="submitBtn">Submit Request</button>
+    </form>
+  </div>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("K28zaafOCn5VDcNV0"); // Replace with your Public Key
+    })();
+
+    const form = document.getElementById("resumeForm");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Sending...";
+
+      const email = this.email.value.trim();
+      const mobile = this.mobile.value.trim();
+      const role = this.role.value;
+
+     // ✅ Check for allowed domains
+  const allowedDomains = ["@gmail.com", "@yahoo.com", ".in"];
+  const isValidDomain = allowedDomains.some(domain => email.endsWith(domain));
+
+  if (!isValidDomain) {
+    alert("❌ Please enter a valid email with allowed domains (e.g., @gmail.com, @yahoo.com, .in).");
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Submit Request";
+    return;
+  }
+
+  alert("✅ Email domain is valid!");
+  submitBtn.disabled = false;
+  submitBtn.innerText = "Submit Request";
+
+
+
+      // ✅ Mobile validation (10–15 digits)
+      const mobileRegex = /^[0-9]{10,15}$/;
+      if (!mobileRegex.test(mobile)) {
+        alert("❌ Please enter a valid mobile number (10-15 digits).");
+        resetButton();
+        return;
+      }
+        alert("✅ Mobile Number is valid!");
+  submitBtn.disabled = false;
+  submitBtn.innerText = "Submit Request";
+
+      let resumeLink = "";
+      if(role === "Frontend"){
+        resumeLink = "https://yourdomain.com/resumes/frontend.pdf";
+      } else if(role === "ProductDesign"){
+        resumeLink = "https://yourdomain.com/resumes/product-design.pdf";
+      } else if(role === "BusinessAnalyst"){
+        resumeLink = "https://yourdomain.com/resumes/business-analyst.pdf";
+      }
+
+      emailjs.send("service_c7bat8r", "template_j9frl7z", {
+        fullName: this.fullName.value,
+        email: email,
+        mobile: mobile,
+        gender: this.gender.value,
+        userType: this.userType.value,
+        role: role,
+        resumeLink: resumeLink
+      }).then(function() {
+        alert("✅ Form submitted successfully! Resume sent to your email.");
+        window.location.href = "index.html";
+      }, function(error) {
+        alert("❌ Failed to send. Error: " + JSON.stringify(error));
+        resetButton();
+      });
+    });
+
+    function resetButton(){
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Submit Request";
+    }
+  </script>
+</body>
+</html>
